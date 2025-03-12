@@ -104,6 +104,8 @@ local JumpPowerSlider = PlayerTab:CreateSlider({
 local Noclip = nil
 local Clip = nil
 
+local floatName = "YourFloatName" -- Replace "YourFloatName" with the actual name you intend to use
+
 function noclip()
     Clip = false
     local function Nocl()
