@@ -207,6 +207,16 @@ local DeviceAndPingToggle = PlayersTab:CreateToggle({
             end
 
             local function createDeviceAndPingLabel(character)
+                -- Remover qualquer GUI existente antes de adicionar um novo
+                local head = character:FindFirstChild("Head")
+                if head then
+                    for _, gui in pairs(head:GetChildren()) do
+                        if gui:IsA("BillboardGui") then
+                            gui:Destroy()
+                        end
+                    end
+                end
+
                 local billboardGui = Instance.new("BillboardGui")
                 billboardGui.Size = UDim2.new(0, 100, 0, 50)
                 billboardGui.StudsOffset = Vector3.new(0, 7, 0) -- Ajusta a posição acima do jogador
@@ -219,7 +229,7 @@ local DeviceAndPingToggle = PlayersTab:CreateToggle({
                 label.TextScaled = true
                 label.Parent = billboardGui
 
-                billboardGui.Parent = character:WaitForChild("Head")
+                billboardGui.Parent = head
 
                 return label
             end
@@ -233,7 +243,7 @@ local DeviceAndPingToggle = PlayersTab:CreateToggle({
                     local characterType = getCharacterType(player)
                     local ultimateValue = player:GetAttribute("Ultimate") or 0
                     ultimateValue = math.floor(ultimateValue) -- Arredonda o valor do Ultimate para o número inteiro mais próximo
-                    label.Text = "Ping: " .. tostring(ping) .. " ms | Device: " .. deviceType .. " | Character: " .. characterType .. " | Ult: " .. tostring(ultimateValue) .. "%"
+                    label.Text = "Ping: " .. tostring(ping) .. " ms | Device: " .. deviceType .. " | Character: " .. characterType .. " | Ultimate: " .. tostring(ultimateValue) .. "%"
                 end)
             end
 
@@ -243,12 +253,60 @@ local DeviceAndPingToggle = PlayersTab:CreateToggle({
                         local label = createDeviceAndPingLabel(character)
                         playerLabels[player] = label
                         updateDeviceAndPingLabel(player, label)
+
+                        -- Detecta quando o jogador morre e remove o label
+                        local humanoid = character:FindFirstChildOfClass("Humanoid")
+                        if humanoid then
+                            humanoid.Died:Connect(function()
+                                if playerLabels[player] then
+                                    playerLabels[player]:Destroy()
+                                    playerLabels[player] = nil
+                                end
+                            end)
+                        end
                     end)
 
                     if player.Character then
                         local label = createDeviceAndPingLabel(player.Character)
                         playerLabels[player] = label
                         updateDeviceAndPingLabel(player, label)
+
+                        -- Detecta quando o jogador morre e remove o label
+                        local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+                        if humanoid then
+                            humanoid.Died:Connect(function()
+                                if playerLabels[player] then
+                                    playerLabels[player]:Destroy()
+                                    playerLabels[player] = nil
+                                end
+                            end)
+                        end
+                    end
+                end
+
+                -- Adiciona detecção de morte para o jogador local
+                local localPlayer = game.Players.LocalPlayer
+                localPlayer.CharacterAdded:Connect(function(character)
+                    local humanoid = character:FindFirstChildOfClass("Humanoid")
+                    if humanoid then
+                        humanoid.Died:Connect(function()
+                            if playerLabels[localPlayer] then
+                                playerLabels[localPlayer]:Destroy()
+                                playerLabels[localPlayer] = nil
+                            end
+                        end)
+                    end
+                end)
+
+                if localPlayer.Character then
+                    local humanoid = localPlayer.Character:FindFirstChildOfClass("Humanoid")
+                    if humanoid then
+                        humanoid.Died:Connect(function()
+                            if playerLabels[localPlayer] then
+                                playerLabels[localPlayer]:Destroy()
+                                playerLabels[localPlayer] = nil
+                            end
+                        end)
                     end
                 end
             end
