@@ -8,8 +8,9 @@ return{
 -- Dark Blue - DarkBlue
 -- Green - Green
 -- Light - Light
---Ocean - Ocean
---Serenity - Serenity
- 
+-- Ocean - Ocean
+-- Serenity - Serenity
+-- Violet - Violet
+
  },
 }
