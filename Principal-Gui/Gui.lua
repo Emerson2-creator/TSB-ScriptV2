@@ -186,7 +186,7 @@ local deviceAndPingEnabled = false
 local playerLabels = {} -- Tabela para armazenar os labels de cada jogador
 
 local DeviceAndPingToggle = PlayersTab:CreateToggle({
-    Name = "Show Info About Players",
+    Name = "Show Info About Players (Bugs can happen)",
     CurrentValue = false,
     Flag = "ShowInfoAboutPlayers",
     Callback = function(Value)
@@ -243,44 +243,23 @@ local DeviceAndPingToggle = PlayersTab:CreateToggle({
                     local characterType = getCharacterType(player)
                     local ultimateValue = player:GetAttribute("Ultimate") or 0
                     ultimateValue = math.floor(ultimateValue) -- Arredonda o valor do Ultimate para o número inteiro mais próximo
-                    label.Text = "Ping: " .. tostring(ping) .. " ms | Device: " .. deviceType .. " | Character: " .. characterType .. " | Ultimate: " .. tostring(ultimateValue) .. "%"
+                    label.Text = "Ping: " .. tostring(ping) .. " ms | Device: " .. deviceType .. " | Character: " .. characterType .. " | Ult: " .. tostring(ultimateValue) .. "%"
                 end)
             end
 
+            -- Função para configurar os labels para todos os jogadores
             local function setupDeviceAndPingLabels()
                 for _, player in pairs(Players:GetPlayers()) do
                     player.CharacterAdded:Connect(function(character)
                         local label = createDeviceAndPingLabel(character)
                         playerLabels[player] = label
                         updateDeviceAndPingLabel(player, label)
-
-                        -- Detecta quando o jogador morre e remove o label
-                        local humanoid = character:FindFirstChildOfClass("Humanoid")
-                        if humanoid then
-                            humanoid.Died:Connect(function()
-                                if playerLabels[player] then
-                                    playerLabels[player]:Destroy()
-                                    playerLabels[player] = nil
-                                end
-                            end)
-                        end
                     end)
 
                     if player.Character then
                         local label = createDeviceAndPingLabel(player.Character)
                         playerLabels[player] = label
                         updateDeviceAndPingLabel(player, label)
-
-                        -- Detecta quando o jogador morre e remove o label
-                        local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
-                        if humanoid then
-                            humanoid.Died:Connect(function()
-                                if playerLabels[player] then
-                                    playerLabels[player]:Destroy()
-                                    playerLabels[player] = nil
-                                end
-                            end)
-                        end
                     end
                 end
 
@@ -331,6 +310,7 @@ local DeviceAndPingToggle = PlayersTab:CreateToggle({
         end
     end,
 })
+
 -- Adicionando um ColorPicker para modificar a cor do texto das informações dos players
 
 local ColorPicker = PlayersTab:CreateColorPicker({
