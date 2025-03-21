@@ -62,3 +62,19 @@ end
 Players.PlayerAdded:Connect(function(player)
     setupPingDisplay(player)
 end)
+
+-- Adicionando uma notificação para o usuario do script aproveirtar o script usando uma lib especifica
+
+local notif = loadstring(game:HttpGet("https://raw.githubusercontent.com/insanedude59/notiflib/main/main"))()
+
+
+notif:Notification("Script --By Emerson","Enjoy the script :)","GothamSemibold","Gotham",5) -- title: <string> description: <string> title font: <string> description font: <string> notification show time: <number>
+
+--[[
+PARAM 1: title: <string>
+PARAM 2: description: <string>
+PARAM 3: title font: <string>
+PARAM 4: description font: <string>
+PARAM 5: notification appearance time: <number>
+
+]]
