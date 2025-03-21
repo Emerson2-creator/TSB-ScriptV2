@@ -22,7 +22,7 @@
 
 local PlayerTab = Window:CreateTab("Player", 10747372167) -- Title, Image
 
--- Criando um slider para alterar a velocidade do jogador
+-- Criando um slider para alterar a velocidade do jogador (Pasta: Scripts/PlayerTabScripts/WalkSpeed.lua)
 
 local WalkSpeedSlider = PlayerTab:CreateSlider({
     Name = "Walk Speed",
@@ -39,7 +39,7 @@ local WalkSpeedSlider = PlayerTab:CreateSlider({
     end,
  })
 
- -- Criando um slider para alterar o pulo do jogador
+ -- Criando um slider para alterar o pulo do jogador (Pasta: Scripts/PlayerTabScripts/JumpPower.lua)
 
 local JumpPowerSlider = PlayerTab:CreateSlider({
     Name = "Jump Power",
@@ -56,7 +56,7 @@ local JumpPowerSlider = PlayerTab:CreateSlider({
     end,
  })
 
- -- criando um slider para alterar a gravidade do workspace
+ -- criando um slider para alterar a gravidade do workspace (Pasta: Scripts/PlayerTabScripts/Gravity.lua)
  local GravitySlider = PlayerTab:CreateSlider({
     Name = "Gravity",
     Range = {0, 500},
@@ -69,7 +69,7 @@ local JumpPowerSlider = PlayerTab:CreateSlider({
     end,
  })
 
- -- Criando um toggle para ativar e desativar o noclip
+ -- Criando uma function noclip (Pasta: Scripts/PlayerTabScripts/Noclip.lua)
 
 local Noclip = nil
 local Clip = nil
@@ -96,7 +96,7 @@ function clip()
     Clip = true
 end
 
--- Toggle to enable/disable noclip
+-- Toggle to enable/disable noclip (Pasta: Scripts/PlayerTabScripts/Noclip.lua)
 
 local NoclipToggle = PlayerTab:CreateToggle({
     Name = "Noclip", -- Toggle name
@@ -111,7 +111,8 @@ local NoclipToggle = PlayerTab:CreateToggle({
     end,
 })
 
--- criando um input para no stun walkspeed
+-- criando um input para no stun walkspeed (Pasta: Scripts/PlayerTabScripts/NoStunWalkSpeed.lua)
+
 local NoStunWalkSpeedInput = PlayerTab:CreateInput({
     Name = "No Stun WalkSpeed (BETA) (put (-) to decrease)",
     CurrentValue = "0",
