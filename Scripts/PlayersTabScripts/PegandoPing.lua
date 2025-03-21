@@ -21,14 +21,20 @@ local function createPingLabel(character)
     return textLabel
 end
 
--- Função para atualizar o valor do ping e dispositivo no TextLabel
+-- Função para atualizar o valor do ping, dispositivo, Ultimate e Character no TextLabel
 local function updatePingLabel(player, textLabel)
     local ping = player:GetAttribute("Ping")
     local device = player:GetAttribute("Mobile") and "Mobile" or "PC"
-    if ping then
-        textLabel.Text = "Ping: " .. math.floor(ping) .. " ms\nDevice: " .. device
+    local ultimate = player:GetAttribute("Ultimate")
+    local character = player:GetAttribute("Character")
+    if ping and ultimate and character then
+        textLabel.Text = "Ping: " .. math.floor(ping) .. " ms\nDevice: " .. device .. "\nUltimate: " .. math.floor(ultimate) .. "%\nCharacter: " .. character
+    elseif ping and ultimate then
+        textLabel.Text = "Ping: " .. math.floor(ping) .. " ms\nDevice: " .. device .. "\nUltimate: " .. math.floor(ultimate) .. "%\nCharacter: N/A"
+    elseif ping then
+        textLabel.Text = "Ping: " .. math.floor(ping) .. " ms\nDevice: " .. device .. "\nUltimate: N/A\nCharacter: N/A"
     else
-        textLabel.Text = "Ping: N/A\nDevice: " .. device
+        textLabel.Text = "Ping: N/A\nDevice: " .. device .. "\nUltimate: N/A\nCharacter: N/A"
     end
 end
 
