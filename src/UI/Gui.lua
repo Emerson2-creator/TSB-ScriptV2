@@ -4,10 +4,9 @@
 -- Este gui é um hack para o jogo The Strongest Battlegrounds
 -- Executor usado: AtlantisV3
 -- este gui é para o Roblox escrito com lua/luau
-local Rayfield = loadstring(game:HttpGet(
-    'https://raw.githubusercontent.com/Emerson2-creator/Universal-GUI-Script/refs/heads/main/RealCode'))()
+local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/Emerson2-creator/Universal-GUI-Script/refs/heads/main/RealCode'))()
 
---[Variaveis]--
+--[variaveis]--
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
@@ -15,12 +14,7 @@ local LocalPlayer = Players.LocalPlayer
 local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
 
--- Cframe Speed Variables
-local Speed = 50
-local SpeedEnabled = false
-
 -- Criando um window/configuração da GUI
-
 local Window = Rayfield:CreateWindow({
     Name = "The Strongest Battlegrounds Hub",
     Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
@@ -63,50 +57,19 @@ Rayfield:Notify({
     Image = 4483362458,
 })
 
+--[Player Tab]--
 
--- Explicação do codigo inteiro.
--- Esse codigo está cortado, mas o codigo mãe esta no Gui.lua
+-- Criando uma nova Tab.
+local PlayerTab = Window:CreateTab("Player", 10747373176) -- Title, Image
 
+-- Criando um label para o CFrame Speed
+local CframeLabel = PlayerTab:CreateLabel("Cframe speed(No Stun)", "fast-forward")
 
---[[
+-- Cframe speed variables
+local Speed = 1
+local SpeedEnabled = false
 
-    -- A players tab é uma tab que vai conter configurações que vai permitir ao usuario do gui ver informações sobre os players, por enquanto esta tab esta em beta, erros podem ocorrer principalmente com o Show Info About Players.
-
-    -- Players tab conteudo:
-    [
-    -- Show Info About Players toggle vai mostrar informações sobre os players, como perssonagem, ult, etc.
-    -- Color Picker vai permitir ao usuario alterar a cor do texto das informações dos players
-    -- ESP toggle vai mostrar um esp nos players
-    -- Tracers toggle vai mostrar um tracer nos players
-    -- Tracer Color Picker vai permitir ao usuario alterar a cor do tracer
-    -- ESP Color Picker vai permitir ao usuario alterar a cor do esp
-
-    -- Em breve vai ter mais configurações, mas por enquanto é isso.
-    ]
-
-]] --
-
-
--- Criando uma nova Tab. Tab players, essa tab vai mostrar informações sobre os player, como perssonagem, ult, etc.
-
-local SpeedTab = Window:CreateTab("Player", 10747373176) -- Title, Image
-
---[Criando um slider para alterar o walkspeed]--
-local WalkSpeedSlider = SpeedTab:CreateSlider({
-    Name = "Walk Speed",
-    Range = { 16, 150 },
-    Increment = 10,
-    Suffix = "WalkSdeed",
-    CurrentValue = 10,
-    Flag = "WalkSpeed", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
-    Callback = function(Value)
-        Humanoid.WalkSpeed = Value
-    end,
-})
-
---[Criando um slider para alterar o CFRAME Walk speed]--
-
--- Função para controlar o CFrame Speed
+--- Função para controlar o CFrame Speed
 local function SpeedControl()
     while SpeedEnabled do
         RunService.RenderStepped:Wait()
@@ -120,10 +83,10 @@ local function SpeedControl()
 end
 
 -- Criando o slider para ajustar o CFrame Speed
-SpeedTab:CreateSlider({
-    Name = "CFrame Walk Speed",
-    Range = { 1, 10 }, -- Intervalo de valores do slider
-    Increment = 1,     -- Incremento do slider
+PlayerTab:CreateSlider({
+    Name = "CFrame Speed",
+    Range = {0, 10}, -- Intervalo de valores do slider
+    Increment = 0.1, -- Incremento do slider
     Suffix = "Speed",
     CurrentValue = Speed,
     Flag = "CFrameSpeed", -- Identificador único
@@ -133,37 +96,16 @@ SpeedTab:CreateSlider({
 })
 
 -- Criando um botão de toggle para ativar/desativar o CFrame Speed
-SpeedTab:CreateToggle({
-    Name = "Enable CFrame Speed",
+PlayerTab:CreateToggle({
+    Name = "CFrame toggle",
     CurrentValue = false,
-    Flag = "EnableCFrameSpeed", -- Identificador único
+    Flag = "ToggleCFrameSpeed", -- Identificador único
     Callback = function(Value)
         SpeedEnabled = Value
         if SpeedEnabled then
             SpeedControl()
         end
     end
-})
-
--- Criando um dropdown para selecionar o método de alteração de velocidade
-SpeedTab:CreateDropdown({
-    Name = "Speed Method",
-    Options = { "WalkSpeed", "CFrame" },
-    CurrentOption = { "WalkSpeed" },
-    MultipleOptions = false,
-    Flag = "SpeedMethod",                 -- Identificador único
-    Callback = function(Options)
-        local selectedMethod = Options[1] -- Obtém a opção selecionada
-        if selectedMethod == "WalkSpeed" then
-            -- Configura para usar o método padrão WalkSpeed
-            SpeedEnabled = false       -- Desativa o CFrame Speed se estiver ativo
-            Humanoid.WalkSpeed = Speed -- Define o WalkSpeed para o valor atual do slider
-        elseif selectedMethod == "CFrame" then
-            -- Configura para usar o método CFrame
-            SpeedEnabled = true
-            SpeedControl() -- Ativa o controle de CFrame Speed
-        end
-    end,
 })
 
 -- Atualizando o Character e HumanoidRootPart quando o jogador resetar
@@ -174,3 +116,6 @@ LocalPlayer.CharacterAdded:Connect(function(NewCharacter)
         SpeedControl()
     end
 end)
+
+-- Criando um label para o CFrame Speed
+local CframeLabel = PlayerTab:CreateLabel("Basi")
