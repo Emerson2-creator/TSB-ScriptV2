@@ -85,7 +85,7 @@ local JumpHeightSlider = PlayerTab:CreateSlider({
     Range = {7.2, 200}, -- Intervalo de valores do slider
     Increment = 1, -- Incremento do slider
     Suffix = "Jump",
-    CurrentValue = 50,
+    CurrentValue = 7.2,
     Flag = "JumpHeight", -- Identificador único
     Callback = function(Value)
         Character.Humanoid.JumpHeight = Value
@@ -111,6 +111,47 @@ local GravitySlider = PlayerTab:CreateSlider({
     end
 })
 
+-- Criando uma function noclip
+local Noclip = nil
+local Clip = nil
+
+local floatName = "YourFloatName" -- Replace "YourFloatName" with the actual name you intend to use
+
+function noclip()
+    Clip = false
+    local function Nocl()
+        if Clip == false and game.Players.LocalPlayer.Character ~= nil then
+            for _,v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+                if v:IsA('BasePart') and v.CanCollide and v.Name ~= floatName then
+                    v.CanCollide = false
+                end
+            end
+        end
+        wait(0.21) -- basic optimization
+    end
+    Noclip = game:GetService('RunService').Stepped:Connect(Nocl)
+end
+
+function clip()
+    if Noclip then Noclip:Disconnect() end
+    Clip = true
+end
+
+-- Toggle to enable/disable noclip
+
+local NoclipToggle = PlayerTab:CreateToggle({
+    Name = "Noclip", -- Toggle name
+    CurrentValue = false, -- Initial value
+    Flag = "ToggleNoclip", -- Flag is the identifier for the config file
+    Callback = function(Value)
+        if Value then
+            noclip()
+        else
+            clip()
+        end
+    end,
+})
+
 -- criando um slider para ajustar o FOV
 local FOVSlider = PlayerTab:CreateSlider({
     Name = "FOV",
@@ -123,26 +164,6 @@ local FOVSlider = PlayerTab:CreateSlider({
         workspace.CurrentCamera.FieldOfView = Value
     end
 })
-
--- variaveis do Infinite Jump
-local InfiniteJumpEnabled = false
-
--- criando um toggle para inf jump
-local InfJumpToggle = PlayerTab:CreateToggle({
-    Name = "Inf Jump",
-    CurrentValue = false,
-    Flag = "InfJump", -- Identificador único
-    Callback = function(Value)
-
- end
-})
-
--- Função para ativar o Infinite Jump
-UserInputService.JumpRequest:Connect(function()
-    if InfiniteJumpEnabled then
-        LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
-    end
-end)
 
 -- criando um label para o CFrame Speed
 local CframeLabel = PlayerTab:CreateLabel("CFrame Speed", "user-cog")
@@ -222,3 +243,4 @@ local NoFatigueToggle = PlayerTab:CreateToggle({
         workspace:SetAttribute("NoFatigue", Value) -- Cria um atributo chamado "IsSpeedEnabled" com o valor inicial false
     end
 })
+
