@@ -336,7 +336,7 @@ local function activateTeleport()
     -- Conectando o evento de tecla pressionada
     teleportConnection = game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
         if gameProcessed then return end -- Ignorar se o jogo já processou a entrada
-        if input.KeyCode == Enum.KeyCode.LeftControl then
+        if input.KeyCode == Enum.KeyCode.RightControl then
             local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
             local hrp = character:FindFirstChild("HumanoidRootPart")
             if hrp then
@@ -366,7 +366,7 @@ end
 
 -- Criando o toggle no CombatTab
 CombatTab:CreateToggle({
-    Name = "Right Ctrl Teleport up ",
+    Name = "Right Ctrl Teleport",
     CurrentValue = false,
     Flag = "ToggleRightCtrlTeleport", -- Identificador único
     Callback = function(Value)
@@ -377,6 +377,7 @@ CombatTab:CreateToggle({
         end
     end
 })
+
 
 
 --[Teleport Tab]--
