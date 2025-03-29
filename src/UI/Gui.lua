@@ -76,13 +76,13 @@ Rayfield:Notify({
 })
 
 
---[Player Tab]--
-
 --[TABS]--
 local PlayerTab = Window:CreateTab("Player", 10747373176)--[Player tab: Local player settings]--
+local CombatTab = Window:CreateTab("Combat", 10747373426)--[Exploits tab: Exploits settings]--
+local Visual = Window:CreateTab("Visual", 10723346959)--[Visuals tab: Visual settings]--
 local TeleportTab = Window:CreateTab("Teleport", 10734886004)--[Teleport tab: Teleport to places]--
-local PlayersTab = Window:CreateTab("Players", 10747373176)--[Player tab: Players settings]--
 
+--[Player Tab]--
 
 -- Criando um label para as configurações básicas
 local BasicSTlabel = PlayerTab:CreateLabel("Basic Settings", "user-cog")
@@ -186,10 +186,10 @@ local FOVSlider = PlayerTab:CreateSlider({
     end
 })
 
-local AdvancedLabel = PlayerTab:CreateLabel("Advanced settings", "user-cog")
+local CombatLabel = CombatTab:CreateLabel("Combat settings", "users")
 
 -- Criando um toggle para No Dash Cooldown
-local NoDashCooldownToggle = PlayerTab:CreateToggle({
+local NoDashCooldownToggle = CombatTab:CreateToggle({
     Name = "No Dash Cooldown",
     CurrentValue = false,
     Flag = "NoDashCooldown", -- Identificador único
@@ -200,7 +200,7 @@ local NoDashCooldownToggle = PlayerTab:CreateToggle({
 })
 
 -- Criando um toggle para No fatigue
-local NoFatigueToggle = PlayerTab:CreateToggle({
+local NoFatigueToggle = CombatTab:CreateToggle({
     Name = "No Fatigue (When you have low health, you won’t slow down.)",
     CurrentValue = false,
     Flag = "NoFatigue", -- Identificador único
@@ -228,7 +228,7 @@ local function SpeedControl()
 end
 
 -- Criando o slider para ajustar o CFrame Speed
-PlayerTab:CreateSlider({
+CombatTab:CreateSlider({
     Name = "CFrame Speed",
     Range = {0, 10}, -- Intervalo de valores do slider
     Increment = 0.1, -- Incremento do slider
@@ -241,7 +241,7 @@ PlayerTab:CreateSlider({
 })
 
 -- Criando um botão de toggle para ativar/desativar o CFrame Speed
-PlayerTab:CreateToggle({
+CombatTab:CreateToggle({
     Name = "CFrame toggle",
     CurrentValue = false,
     Flag = "ToggleCFrameSpeed", -- Identificador único
@@ -261,6 +261,122 @@ LocalPlayer.CharacterAdded:Connect(function(NewCharacter)
         SpeedControl()
     end
 end)
+
+-- Variáveis para controlar o estado do fling
+local hiddenfling = false
+local flingConnection
+
+-- Função para ativar o fling
+local function activateFling()
+    hiddenfling = true
+    local lp = Players.LocalPlayer
+    local c, hrp, vel, movel = nil, nil, nil, 0.1
+
+    -- Loop para aplicar o fling
+    flingConnection = RunService.Heartbeat:Connect(function()
+        c = lp.Character
+        hrp = c and c:FindFirstChild("HumanoidRootPart")
+
+        if hrp then
+            vel = hrp.Velocity
+            hrp.Velocity = vel * 10000 + Vector3.new(0, 10000, 0)
+            RunService.RenderStepped:Wait()
+            hrp.Velocity = vel
+            RunService.Stepped:Wait()
+            hrp.Velocity = vel + Vector3.new(0, movel, 0)
+            movel = -movel
+        end
+    end)
+end
+
+-- Função para desativar o fling
+local function deactivateFling()
+    hiddenfling = false
+
+    -- Desconectar o loop do fling
+    if flingConnection then
+        flingConnection:Disconnect()
+        flingConnection = nil
+    end
+
+    -- Resetar a rotação e velocidade do HumanoidRootPart
+    local lp = Players.LocalPlayer
+    local c = lp.Character
+    local hrp = c and c:FindFirstChild("HumanoidRootPart")
+
+    if hrp then
+        hrp.Velocity = Vector3.new(0, 0, 0) -- Para a velocidade
+        hrp.RotVelocity = Vector3.new(0, 0, 0) -- Para a rotação
+        hrp.CFrame = CFrame.new(hrp.Position) -- Remove qualquer rotação
+    end
+end
+
+-- Criando o toggle no CombatTab
+CombatTab:CreateToggle({
+    Name = "Fling",
+    CurrentValue = false,
+    Flag = "ToggleFling", -- Identificador único
+    Callback = function(Value)
+        if Value then
+            activateFling()
+        else
+            deactivateFling()
+        end
+    end
+})
+
+-- Variáveis para controlar o estado do teleport
+local teleportEnabled = false
+local teleportConnection
+
+-- Função para ativar o teleport
+local function activateTeleport()
+    teleportEnabled = true
+
+    -- Conectando o evento de tecla pressionada
+    teleportConnection = game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
+        if gameProcessed then return end -- Ignorar se o jogo já processou a entrada
+        if input.KeyCode == Enum.KeyCode.LeftControl then
+            local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+            local hrp = character:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                hrp.CFrame = CFrame.new(132, 734, -8) -- Posição para teleportar
+            end
+        end
+    end)
+
+    -- Garantir que a funcionalidade persista após a morte
+    LocalPlayer.CharacterAdded:Connect(function(newCharacter)
+        if teleportEnabled then
+            activateTeleport() -- Reativar o teleport ao reaparecer
+        end
+    end)
+end
+
+-- Função para desativar o teleport
+local function deactivateTeleport()
+    teleportEnabled = false
+
+    -- Desconectar o evento de tecla pressionada
+    if teleportConnection then
+        teleportConnection:Disconnect()
+        teleportConnection = nil
+    end
+end
+
+-- Criando o toggle no CombatTab
+CombatTab:CreateToggle({
+    Name = "Right Ctrl Teleport up ",
+    CurrentValue = false,
+    Flag = "ToggleRightCtrlTeleport", -- Identificador único
+    Callback = function(Value)
+        if Value then
+            activateTeleport()
+        else
+            deactivateTeleport()
+        end
+    end
+})
 
 
 --[Teleport Tab]--
@@ -283,7 +399,7 @@ local TeleportToDeathCounterButton = TeleportTab:CreateButton({
 
 -- Criando um botão para teleportar para a proteção do void posição 0, -492, 0
 local TeleportToVoidProtectionButton = TeleportTab:CreateButton({
-    Name = "Void Protection",
+    Name = "Void (Kill players but not you)",
     Callback = function()
         HumanoidRootPart.CFrame = CFrame.new(0, -492, 0)
     end
