@@ -1,9 +1,27 @@
--- Este Script está em BETA, então pode conter bugs
--- importando a biblioteca de GUI atraves de um loadstring
--- O script estara em ingles, pois a biblioteca de GUI esta em ingles
--- Este gui é um hack para o jogo The Strongest Battlegrounds
--- Executor usado: AtlantisV3
--- este gui é para o Roblox escrito com lua/luau
+-- Função para criar uma parte gigante antes do void
+local function createVoidProtection()
+    -- Configurações da parte
+    local partSize = Vector3.new(10000, 10, 10000) -- Aumentando a espessura (Y = 10)
+    local partPosition = Vector3.new(0, -500, 0) -- Posição da parte (ajuste a altura conforme necessário)
+    local partTransparency = 0.5 -- Transparência da parte
+    local partColor = Color3.fromRGB(255, 0, 0) -- Cor da parte (vermelho claro)
+
+    -- Criando a parte
+    local voidPart = Instance.new("Part")
+    voidPart.Size = partSize
+    voidPart.Position = partPosition
+    voidPart.Anchored = true -- A parte não se move
+    voidPart.CanCollide = true -- Jogadores podem colidir com a parte
+    voidPart.Transparency = partTransparency
+    voidPart.Color = partColor
+    voidPart.Name = "VoidProtection"
+    voidPart.Parent = workspace -- Adiciona a parte ao Workspace
+end
+
+-- Chamando a função para criar a proteção do void
+createVoidProtection()
+
+--[Rayfield Library]--
 local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/Emerson2-creator/Universal-GUI-Script/refs/heads/main/RealCode'))()
 
 --[variaveis]--
@@ -16,11 +34,11 @@ local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
 
 -- Criando um window/configuração da GUI
 local Window = Rayfield:CreateWindow({
-    Name = "The Strongest Battlegrounds Hub",
+    Name = "Strongest Hub",
     Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
     LoadingTitle = "The Strongest Battlegrounds",
     LoadingSubtitle = "By Emerson",
-    Theme = "DarkBlue", -- Check https://docs.sirius.menu/rayfield/configuration/themes
+    Theme = "Amethyst", -- Check https://docs.sirius.menu/rayfield/configuration/themes
 
     DisableRayfieldPrompts = false,
     DisableBuildWarnings = false, -- Prevents Rayfield from warning when the script has a version mismatch with the interface
@@ -57,14 +75,17 @@ Rayfield:Notify({
     Image = 4483362458,
 })
 
+
 --[Player Tab]--
 
--- Criando uma nova Tab.
-local PlayerTab = Window:CreateTab("Player", 10747373176) -- Title, Image
+--[TABS]--
+local PlayerTab = Window:CreateTab("Player", 10747373176)--[Player tab: Local player settings]--
+local TeleportTab = Window:CreateTab("Teleport", 10734886004)--[Teleport tab: Teleport to places]--
+local PlayersTab = Window:CreateTab("Players", 10747373176)--[Player tab: Players settings]--
 
 
--- Criando um label para o CFrame Speed
-local CframeLabel = PlayerTab:CreateLabel("Basic Settings", "user-cog")
+-- Criando um label para as configurações básicas
+local BasicSTlabel = PlayerTab:CreateLabel("Basic Settings", "user-cog")
 
 -- Criando um slider para ajustar o WalkSpeed
 local WalkSpeedSlider = PlayerTab:CreateSlider({
@@ -165,8 +186,29 @@ local FOVSlider = PlayerTab:CreateSlider({
     end
 })
 
--- criando um label para o CFrame Speed
-local CframeLabel = PlayerTab:CreateLabel("CFrame Speed", "user-cog")
+local AdvancedLabel = PlayerTab:CreateLabel("Advanced settings", "user-cog")
+
+-- Criando um toggle para No Dash Cooldown
+local NoDashCooldownToggle = PlayerTab:CreateToggle({
+    Name = "No Dash Cooldown",
+    CurrentValue = false,
+    Flag = "NoDashCooldown", -- Identificador único
+    Callback = function(Value)
+        -- Criando um atributo booleano no Workspace
+        workspace:SetAttribute("NoDashCooldown", Value) -- Cria um atributo chamado "IsSpeedEnabled" com o valor inicial false
+    end
+})
+
+-- Criando um toggle para No fatigue
+local NoFatigueToggle = PlayerTab:CreateToggle({
+    Name = "No Fatigue (When you have low health, you won’t slow down.)",
+    CurrentValue = false,
+    Flag = "NoFatigue", -- Identificador único
+    Callback = function(Value)
+        -- Criando um atributo booleano no Workspace
+        workspace:SetAttribute("NoFatigue", Value) -- Cria um atributo chamado "IsSpeedEnabled" com o valor inicial false
+    end
+})
 
 -- Cframe speed variables
 local Speed = 1
@@ -220,27 +262,101 @@ LocalPlayer.CharacterAdded:Connect(function(NewCharacter)
     end
 end)
 
-local AdvancedLabel = PlayerTab:CreateLabel("Advanced settings", "user-cog")
 
--- Criando um toggle para No Dash Cooldown
-local NoDashCooldownToggle = PlayerTab:CreateToggle({
-    Name = "No Dash Cooldown",
-    CurrentValue = false,
-    Flag = "NoDashCooldown", -- Identificador único
-    Callback = function(Value)
-        -- Criando um atributo booleano no Workspace
-        workspace:SetAttribute("NoDashCooldown", Value) -- Cria um atributo chamado "IsSpeedEnabled" com o valor inicial false
+--[Teleport Tab]--
+
+-- Criando um botão para teleportar para o Atoms posicão 1079, 155, 23003
+local TeleportToAtomicRoomButton = TeleportTab:CreateButton({
+    Name = "Atomic Room",
+    Callback = function()
+        HumanoidRootPart.CFrame = CFrame.new(1079, 155, 23003)
     end
 })
 
--- Criando um toggle para No fatigue
-local NoFatigueToggle = PlayerTab:CreateToggle({
-    Name = "No Fatigue (When you have low health, you won’t slow down.)",
-    CurrentValue = false,
-    Flag = "NoFatigue", -- Identificador único
-    Callback = function(Value)
-        -- Criando um atributo booleano no Workspace
-        workspace:SetAttribute("NoFatigue", Value) -- Cria um atributo chamado "IsSpeedEnabled" com o valor inicial false
+---- Criando um botão para teleportar para o Death counter room posição -92, 29, 20347
+local TeleportToDeathCounterButton = TeleportTab:CreateButton({
+    Name = "Death Counter Room",
+    Callback = function()
+        HumanoidRootPart.CFrame = CFrame.new(-92, 29, 20347)
     end
 })
 
+-- Criando um botão para teleportar para a proteção do void posição 0, -492, 0
+local TeleportToVoidProtectionButton = TeleportTab:CreateButton({
+    Name = "Void Protection",
+    Callback = function()
+        HumanoidRootPart.CFrame = CFrame.new(0, -492, 0)
+    end
+})
+
+-- Criando um botão para teleportar para o baseplate posição 968, 20, 23088
+local TeleportToBaseplateButton = TeleportTab:CreateButton({
+    Name = "Baseplate",
+    Callback = function()
+        HumanoidRootPart.CFrame = CFrame.new(968, 20, 23088)
+    end
+})
+
+-- Criando um botão para teleportar para o meio do mapa pisição 148, 441, 27
+local TeleportToMiddleButton = TeleportTab:CreateButton({
+    Name = "Middle of the map",
+    Callback = function()
+        HumanoidRootPart.CFrame = CFrame.new(148, 441, 27)
+    end
+})
+
+-- Criando um botão para teleportar para a montanha 1 posição 266, 699, 458
+local TeleportToMountain1Button = TeleportTab:CreateButton({
+    Name = "Mountain 1",
+    Callback = function()
+        HumanoidRootPart.CFrame = CFrame.new(266, 699, 458)
+    end
+})
+
+-- Criando um botão para teleportar para a montanha 2 posição 551, 630, -265
+local TeleportToMountain2Button = TeleportTab:CreateButton({
+    Name = "Mountain 2",
+    Callback = function()
+        HumanoidRootPart.CFrame = CFrame.new(551, 630, -265)
+    end
+})
+
+-- Criando um botão para teleportar para a montanha 3 posição -107, 642, -328
+local TeleportToMountain3Button = TeleportTab:CreateButton({
+    Name = "Mountain 3",
+    Callback = function()
+        HumanoidRootPart.CFrame = CFrame.new(-107, 642, -328)
+    end
+})
+
+-- Criando um botão para teleportar para armadilha 1 posição 378, 440, 448
+local TeleportToTrap1Button = TeleportTab:CreateButton({
+    Name = "Trap 1",
+    Callback = function()
+        HumanoidRootPart.CFrame = CFrame.new(378, 440, 448)
+    end
+})
+
+-- Criando um botão para teleportar para armadilha 2 posição 287, 440, 481
+local TeleportToTrap2Button = TeleportTab:CreateButton({
+    Name = "Trap 2",
+    Callback = function()
+        HumanoidRootPart.CFrame = CFrame.new(287, 440, 481)
+    end
+})
+
+-- Criando um botão para teleportar para um canto 1 do mapa posição -226, 440, -415
+local TeleportToCornerButton = TeleportTab:CreateButton({
+    Name = "Corner 1",
+    Callback = function()
+        HumanoidRootPart.CFrame = CFrame.new(-226, 440, -415)
+    end
+})
+
+-- Criando um botão para teleportar para o canto 2 do mapa posição 526, 440, 481
+local TeleportToCorner2Button = TeleportTab:CreateButton({
+    Name = "Corner 2",
+    Callback = function()
+        HumanoidRootPart.CFrame = CFrame.new(526, 440, 481)
+    end
+})
