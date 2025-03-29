@@ -62,8 +62,90 @@ Rayfield:Notify({
 -- Criando uma nova Tab.
 local PlayerTab = Window:CreateTab("Player", 10747373176) -- Title, Image
 
+
 -- Criando um label para o CFrame Speed
-local CframeLabel = PlayerTab:CreateLabel("Cframe speed(No Stun)", "fast-forward")
+local CframeLabel = PlayerTab:CreateLabel("Basic Settings", "user-cog")
+
+-- Criando um slider para ajustar o WalkSpeed
+local WalkSpeedSlider = PlayerTab:CreateSlider({
+    Name = "WalkSpeed",
+    Range = {16, 200}, -- Intervalo de valores do slider
+    Increment = 1, -- Incremento do slider
+    Suffix = "Speed",
+    CurrentValue = 16,
+    Flag = "WalkSpeed", -- Identificador único
+    Callback = function(Value)
+        Character.Humanoid.WalkSpeed = Value
+    end
+})
+
+-- Criando um slider para ajustar o JumpPower
+local JumpHeightSlider = PlayerTab:CreateSlider({
+    Name = "JumpHeight",
+    Range = {7.2, 200}, -- Intervalo de valores do slider
+    Increment = 1, -- Incremento do slider
+    Suffix = "Jump",
+    CurrentValue = 50,
+    Flag = "JumpHeight", -- Identificador único
+    Callback = function(Value)
+        Character.Humanoid.JumpHeight = Value
+        --desativando o jump power
+        Character.Humanoid.UseJumpPower = false
+        -- se o valor do jump height for 7.2, reativando o jump power
+        if Value == 7.2 then
+            Character.Humanoid.UseJumpPower = true
+        end
+    end
+})
+
+-- Criando um slider para ajustar a gravidade
+local GravitySlider = PlayerTab:CreateSlider({
+    Name = "Gravity",
+    Range = {0, 196.2}, -- Intervalo de valores do slider
+    Increment = 1, -- Incremento do slider
+    Suffix = "Gravity",
+    CurrentValue = 196.2,
+    Flag = "Gravity", -- Identificador único
+    Callback = function(Value)
+        workspace.Gravity = Value
+    end
+})
+
+-- criando um slider para ajustar o FOV
+local FOVSlider = PlayerTab:CreateSlider({
+    Name = "FOV",
+    Range = {70, 120}, -- Intervalo de valores do slider
+    Increment = 1, -- Incremento do slider
+    Suffix = "FOV",
+    CurrentValue = 70,
+    Flag = "FOV", -- Identificador único
+    Callback = function(Value)
+        workspace.CurrentCamera.FieldOfView = Value
+    end
+})
+
+-- variaveis do Infinite Jump
+local InfiniteJumpEnabled = false
+
+-- criando um toggle para inf jump
+local InfJumpToggle = PlayerTab:CreateToggle({
+    Name = "Inf Jump",
+    CurrentValue = false,
+    Flag = "InfJump", -- Identificador único
+    Callback = function(Value)
+
+ end
+})
+
+-- Função para ativar o Infinite Jump
+UserInputService.JumpRequest:Connect(function()
+    if InfiniteJumpEnabled then
+        LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
+    end
+end)
+
+-- criando um label para o CFrame Speed
+local CframeLabel = PlayerTab:CreateLabel("CFrame Speed", "user-cog")
 
 -- Cframe speed variables
 local Speed = 1
@@ -117,5 +199,26 @@ LocalPlayer.CharacterAdded:Connect(function(NewCharacter)
     end
 end)
 
--- Criando um label para o CFrame Speed
-local CframeLabel = PlayerTab:CreateLabel("Basi")
+local AdvancedLabel = PlayerTab:CreateLabel("Advanced settings", "user-cog")
+
+-- Criando um toggle para No Dash Cooldown
+local NoDashCooldownToggle = PlayerTab:CreateToggle({
+    Name = "No Dash Cooldown",
+    CurrentValue = false,
+    Flag = "NoDashCooldown", -- Identificador único
+    Callback = function(Value)
+        -- Criando um atributo booleano no Workspace
+        workspace:SetAttribute("NoDashCooldown", Value) -- Cria um atributo chamado "IsSpeedEnabled" com o valor inicial false
+    end
+})
+
+-- Criando um toggle para No fatigue
+local NoFatigueToggle = PlayerTab:CreateToggle({
+    Name = "No Fatigue (When you have low health, you won’t slow down.)",
+    CurrentValue = false,
+    Flag = "NoFatigue", -- Identificador único
+    Callback = function(Value)
+        -- Criando um atributo booleano no Workspace
+        workspace:SetAttribute("NoFatigue", Value) -- Cria um atributo chamado "IsSpeedEnabled" com o valor inicial false
+    end
+})
