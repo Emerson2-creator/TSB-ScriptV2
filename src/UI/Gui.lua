@@ -325,60 +325,7 @@ CombatTab:CreateToggle({
     end
 })
 
--- Variáveis para controlar o estado do teleport
-local teleportEnabled = false
-local teleportConnection
-
--- Função para ativar o teleport
-local function activateTeleport()
-    teleportEnabled = true
-
-    -- Conectando o evento de tecla pressionada
-    teleportConnection = game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
-        if gameProcessed then return end -- Ignorar se o jogo já processou a entrada
-        if input.KeyCode == Enum.KeyCode.RightControl then
-            local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-            local hrp = character:FindFirstChild("HumanoidRootPart")
-            if hrp then
-                hrp.CFrame = CFrame.new(132, 734, -8) -- Posição para teleportar
-            end
-        end
-    end)
-
-    -- Garantir que a funcionalidade persista após a morte
-    LocalPlayer.CharacterAdded:Connect(function(newCharacter)
-        if teleportEnabled then
-            activateTeleport() -- Reativar o teleport ao reaparecer
-        end
-    end)
-end
-
--- Função para desativar o teleport
-local function deactivateTeleport()
-    teleportEnabled = false
-
-    -- Desconectar o evento de tecla pressionada
-    if teleportConnection then
-        teleportConnection:Disconnect()
-        teleportConnection = nil
-    end
-end
-
--- Criando o toggle no CombatTab
-CombatTab:CreateToggle({
-    Name = "Right Ctrl Teleport",
-    CurrentValue = false,
-    Flag = "ToggleRightCtrlTeleport", -- Identificador único
-    Callback = function(Value)
-        if Value then
-            activateTeleport()
-        else
-            deactivateTeleport()
-        end
-    end
-})
-
-
+-- criando um toggle para key bind Right ctrl para teleportar para o alto posição 132, 734, -8
 
 --[Teleport Tab]--
 
