@@ -186,6 +186,14 @@ local FOVSlider = PlayerTab:CreateSlider({
     end
 })
 
+-- Criando um botão para carregar um fly gui
+local FlyGuiButton = PlayerTab:CreateButton({
+    Name = "Fly GUI",
+    Callback = function()
+        
+    end
+})
+
 local CombatLabel = CombatTab:CreateLabel("Combat settings", "users")
 
 -- Criando um toggle para No Dash Cooldown
