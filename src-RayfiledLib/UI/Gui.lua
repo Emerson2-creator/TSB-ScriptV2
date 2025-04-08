@@ -21,6 +21,22 @@ end
 -- Chamando a função para criar a proteção do void
 createVoidProtection()
 
+-- Uma função que vai criar um Atributo(String) no workspace chamado VIPServer com o UserId do jogador local
+-- e vai criar um Atributo(String) no workspace chamado VIPServerOwner com o nome do jogador local
+local function createVIPServerAttribute()
+    local player = game.Players.LocalPlayer
+    local userId = player.UserId
+    local playerName = player.Name
+
+    -- Criando o atributo VIPServer com o UserId do jogador local
+    workspace:SetAttribute("VIPServer", tostring(userId))
+
+    -- Criando o atributo VIPServerOwner com o nome do jogador local
+    workspace:SetAttribute("VIPServerOwner", playerName)
+end
+-- Chamando a função para criar os atributos
+createVIPServerAttribute()
+
 --[Rayfield Library]--
 local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/Emerson2-creator/Universal-GUI-Script/refs/heads/main/RealCode'))()
 
@@ -34,7 +50,7 @@ local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
 
 -- Criando um window/configuração da GUI
 local Window = Rayfield:CreateWindow({
-    Name = "Strongest Hub",
+    Name = "Strongest Hub (Beta)",
     Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
     LoadingTitle = "The Strongest Battlegrounds",
     LoadingSubtitle = "By Emerson",
@@ -78,27 +94,15 @@ Rayfield:Notify({
 
 --[TABS]--
 local PlayerTab = Window:CreateTab("Player", 10747373176)--[Player tab: Local player settings]--
-local CombatTab = Window:CreateTab("Combat", 10747373426)--[Exploits tab: Exploits settings]--
-local Visual = Window:CreateTab("Visual", 10723346959)--[Visuals tab: Visual settings]--
+local ExploitsTab = Window:CreateTab("Exploits", 10734943448)--[Exploits tab: Exploits settings]--
+local VisualTab = Window:CreateTab("Visual", 10723346959)--[Visuals tab: Visual settings]--
 local TeleportTab = Window:CreateTab("Teleport", 10734886004)--[Teleport tab: Teleport to places]--
+local ScriptsTab = Window:CreateTab("Scripts", 10723356507)--[Scripts tab: Scripts]--
 
 --[Player Tab]--
 
 -- Criando um label para as configurações básicas
 local BasicSTlabel = PlayerTab:CreateLabel("Basic Settings", "user-cog")
-
--- Criando um slider para ajustar o WalkSpeed
-local WalkSpeedSlider = PlayerTab:CreateSlider({
-    Name = "WalkSpeed",
-    Range = {16, 200}, -- Intervalo de valores do slider
-    Increment = 1, -- Incremento do slider
-    Suffix = "Speed",
-    CurrentValue = 16,
-    Flag = "WalkSpeed", -- Identificador único
-    Callback = function(Value)
-        Character.Humanoid.WalkSpeed = Value
-    end
-})
 
 -- Criando um slider para ajustar o JumpPower
 local JumpHeightSlider = PlayerTab:CreateSlider({
@@ -186,18 +190,82 @@ local FOVSlider = PlayerTab:CreateSlider({
     end
 })
 
--- Criando um botão para carregar um fly gui
-local FlyGuiButton = PlayerTab:CreateButton({
-    Name = "Fly GUI",
-    Callback = function()
-        
+-- Variáveis para controlar o spin
+local SpinSpeed = 0
+local SpinEnabled = false
+local SpinConnection
+
+-- Função para iniciar o spin
+local function startSpin()
+    if SpinConnection then SpinConnection:Disconnect() end
+    SpinEnabled = true
+    SpinConnection = RunService.RenderStepped:Connect(function()
+        if Character and Character:FindFirstChild("HumanoidRootPart") and SpinSpeed > 0 then
+            local HumanoidRootPart = Character.HumanoidRootPart
+            HumanoidRootPart.CFrame = HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(SpinSpeed), 0)
+        end
+    end)
+end
+
+-- Função para parar o spin e resetar a rotação
+local function stopSpin()
+    if SpinConnection then SpinConnection:Disconnect() end
+    SpinEnabled = false
+    if Character and Character:FindFirstChild("HumanoidRootPart") then
+        local HumanoidRootPart = Character.HumanoidRootPart
+        HumanoidRootPart.CFrame = CFrame.new(HumanoidRootPart.Position) -- Reseta a rotação
+    end
+end
+
+-- Criando o slider para controlar o spin
+PlayerTab:CreateSlider({
+    Name = "Spin Speed",
+    Range = {0, 300}, -- Intervalo de valores do slider
+    Increment = 1, -- Incremento do slider
+    Suffix = "Spin", -- Unidade de medida
+    CurrentValue = 0, -- Valor inicial
+    Flag = "SpinSpeed", -- Identificador único
+    Callback = function(Value)
+        SpinSpeed = Value
+        if SpinSpeed > 0 then
+            startSpin()
+        else
+            stopSpin()
+        end
     end
 })
 
-local CombatLabel = CombatTab:CreateLabel("Combat settings", "users")
+-- Variável para controlar o estado do Infinite Jump
+local InfiniteJumpEnabled = false
+
+-- Função para ativar/desativar o Infinite Jump
+local function toggleInfiniteJump()
+    if InfiniteJumpEnabled then
+        -- Conecta o evento UserInputService para permitir pular infinitamente
+        game:GetService("UserInputService").JumpRequest:Connect(function()
+            if InfiniteJumpEnabled and Character and Character:FindFirstChild("Humanoid") then
+                Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+            end
+        end)
+    end
+end
+
+-- Criando o toggle para Infinite Jump
+PlayerTab:CreateToggle({
+    Name = "Infinite Jump",
+    CurrentValue = false, -- Valor inicial
+    Flag = "InfiniteJump", -- Identificador único
+    Callback = function(Value)
+        InfiniteJumpEnabled = Value
+        toggleInfiniteJump()
+    end
+})
+
+--[Exploits Tab]--
+local ExploitsLabel = ExploitsTab:CreateLabel("Exploits", "scroll")
 
 -- Criando um toggle para No Dash Cooldown
-local NoDashCooldownToggle = CombatTab:CreateToggle({
+local NoDashCooldownToggle = ExploitsTab:CreateToggle({
     Name = "No Dash Cooldown",
     CurrentValue = false,
     Flag = "NoDashCooldown", -- Identificador único
@@ -208,7 +276,7 @@ local NoDashCooldownToggle = CombatTab:CreateToggle({
 })
 
 -- Criando um toggle para No fatigue
-local NoFatigueToggle = CombatTab:CreateToggle({
+local NoFatigueToggle = ExploitsTab:CreateToggle({
     Name = "No Fatigue (When you have low health, you won’t slow down.)",
     CurrentValue = false,
     Flag = "NoFatigue", -- Identificador único
@@ -236,7 +304,7 @@ local function SpeedControl()
 end
 
 -- Criando o slider para ajustar o CFrame Speed
-CombatTab:CreateSlider({
+ExploitsTab:CreateSlider({
     Name = "CFrame Speed",
     Range = {0, 10}, -- Intervalo de valores do slider
     Increment = 0.1, -- Incremento do slider
@@ -249,7 +317,7 @@ CombatTab:CreateSlider({
 })
 
 -- Criando um botão de toggle para ativar/desativar o CFrame Speed
-CombatTab:CreateToggle({
+ExploitsTab:CreateToggle({
     Name = "CFrame toggle",
     CurrentValue = false,
     Flag = "ToggleCFrameSpeed", -- Identificador único
@@ -319,8 +387,8 @@ local function deactivateFling()
     end
 end
 
--- Criando o toggle no CombatTab
-CombatTab:CreateToggle({
+-- Criando o toggle no ExploitsTab para ativar/desativar o fling
+ExploitsTab:CreateToggle({
     Name = "Fling",
     CurrentValue = false,
     Flag = "ToggleFling", -- Identificador único
@@ -333,7 +401,18 @@ CombatTab:CreateToggle({
     end
 })
 
--- criando um toggle para key bind Right ctrl para teleportar para o alto posição 132, 734, -8
+--[Visual Tab]--
+
+-- Criando um botão que vai carregar um script externo Show Players Info
+local ShowPlayersInfo = VisualTab:CreateButton({
+    Name = "Show Players Info",
+    Callback = function()
+        -- URL do script externo
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Emerson2-creator/Scripts-Roblox/refs/heads/main/Scripts/InfoPlayerTab.lua"))();
+    end
+})
+
+local ComingsoonParagraph = VisualTab:CreateParagraph({Title = "Coming soon", Content = "coming soon..."})
 
 --[Teleport Tab]--
 
@@ -430,5 +509,25 @@ local TeleportToCorner2Button = TeleportTab:CreateButton({
     Name = "Corner 2",
     Callback = function()
         HumanoidRootPart.CFrame = CFrame.new(526, 440, 481)
+    end
+})
+
+--[Scripts Tab]--
+
+-- Criando um botão que vai carregar um script externo Infinite Yield
+local InfiniteYieldButton = ScriptsTab:CreateButton({
+    Name = "Infinite Yield",
+    Callback = function()
+        -- URL do script externo
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+    end
+})
+
+-- Criando um botão que vai carregar um script externo Dex Explorer
+local DexExplorerButton = ScriptsTab:CreateButton({
+    Name = "Dex Explorer",
+    Callback = function()
+        -- URL do script externo
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
     end
 })
