@@ -1,3 +1,9 @@
+local notif = loadstring(game:HttpGet("https://raw.githubusercontent.com/insanedude59/notiflib/main/main"))()
+
+-- falando que o script pode demorar um pouco para carregar
+notif:Notification("Strongest Hub","Loading... this can take 60s","GothamSemibold","Gotham",5) -- title: <string> description: <string> title font: <string> description font: <string> notification show time: <number>
+
+
 -- Função para criar uma parte gigante antes do void
 local function createVoidProtection()
     -- Configurações da parte
@@ -54,13 +60,13 @@ local Window = Rayfield:CreateWindow({
     Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
     LoadingTitle = "The Strongest Battlegrounds",
     LoadingSubtitle = "By Emerson",
-    Theme = "Amethyst", -- Check https://docs.sirius.menu/rayfield/configuration/themes
+    Theme = "Default", -- Check https://docs.sirius.menu/rayfield/configuration/themes
 
     DisableRayfieldPrompts = false,
     DisableBuildWarnings = false, -- Prevents Rayfield from warning when the script has a version mismatch with the interface
 
     ConfigurationSaving = {
-        Enabled = false,
+        Enabled = true,
         FolderName = nil,    -- Create a custom folder for your hub/game
         FileName = "TSB hub" -- Name of the file where the configuration will be saved
     },
@@ -415,6 +421,33 @@ local ShowPlayersInfo = VisualTab:CreateButton({
 local ComingsoonParagraph = VisualTab:CreateParagraph({Title = "Coming soon", Content = "coming soon..."})
 
 --[Teleport Tab]--
+
+-- Função para teleportar para outro jogador
+local function teleportToPlayer(targetPlayerName)
+    local targetPlayer = Players:FindFirstChild(targetPlayerName)
+    if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
+    else
+        Rayfield:Notify({
+            Title = "Teleport Error",
+            Content = "Player not found or invalid target!",
+            Duration = 5,
+            Image = 4483362458,
+        })
+    end
+end
+
+-- Criando um input para o jogador digitar o nome do player
+local TeleportInput = TeleportTab:CreateInput({
+    Name = "Teleport to Player",
+    CurrentValue = "",
+    PlaceholderText = "Enter player name",
+    RemoveTextAfterFocusLost = false,
+    Flag = "TeleportInput", -- Identificador único
+    Callback = function(Text)
+        teleportToPlayer(Text) -- Chama a função de teleporte com o nome digitado
+    end,
+})
 
 -- Criando um botão para teleportar para o Atoms posicão 1079, 155, 23003
 local TeleportToAtomicRoomButton = TeleportTab:CreateButton({
